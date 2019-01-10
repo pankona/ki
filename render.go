@@ -2,38 +2,51 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	//"os"
 	"path/filepath"
+	"time"
 )
 
 func Render(e *entry) {
+	start := time.Now()
+	defer func() {
+		end := time.Now()
+		fmt.Printf("%v msec elapsed to render\n", (end.Sub(start)).Nanoseconds()/int64(time.Millisecond))
+	}()
+
 	fmt.Printf("./\n")
 	for i, v := range e.entries {
 		render(v, 0, []bool{}, i < len(e.entries)-1)
 	}
 }
 
+var output = ioutil.Discard
+
+//var output = os.Stdout
+
 func render(e *entry, depth int, parentHasChild []bool, hasNext bool) {
 	for i := 0; i < depth; i++ {
 		if parentHasChild[i] {
-			fmt.Printf("|   ")
+			fmt.Fprintf(output, "|   ")
 		} else {
-			fmt.Printf("    ")
+			fmt.Fprintf(output, "    ")
 		}
 	}
 
 	if hasNext {
-		fmt.Printf("|-- ")
+		fmt.Fprintf(output, "|-- ")
 	} else {
-		fmt.Printf("`-- ")
+		fmt.Fprintf(output, "`-- ")
 	}
 
 	if e.isDir {
-		fmt.Printf("%s/", filepath.Base(e.path))
+		fmt.Fprintf(output, "%s/", filepath.Base(e.path))
 	} else {
-		fmt.Printf("%s", filepath.Base(e.path))
+		fmt.Fprintf(output, "%s", filepath.Base(e.path))
 	}
 
-	fmt.Printf("\n")
+	fmt.Fprintf(output, "\n")
 
 	hasChild := append(parentHasChild, hasNext)
 	for i, v := range e.entries {
