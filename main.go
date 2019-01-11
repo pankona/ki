@@ -16,12 +16,9 @@ func main() {
 		fmt.Printf("%v msec elapsed in total\n", (end.Sub(start)).Nanoseconds()/int64(time.Millisecond))
 	}()
 
-	fmt.Printf("NumCPU: %d\n", runtime.NumCPU())
-	runtime.GOMAXPROCS(runtime.NumCPU())
-
 	for _, v := range dirList {
-		rootdir, err := ConcurrentTraverse(v)
-		//_, err = Traverse(v)
+		//rootdir, err := ConcurrentTraverse(v)
+		rootdir, err := Traverse(v)
 		if err != nil {
 			fmt.Println(err)
 		}
