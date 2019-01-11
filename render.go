@@ -1,12 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"io/ioutil"
 	//"os"
 	"path/filepath"
 	"time"
 )
+
+//var output = ioutil.Discard
+//var output = os.Stdout
+var output = &bytes.Buffer{}
 
 func Render(e *entry) {
 	start := time.Now()
@@ -15,15 +19,13 @@ func Render(e *entry) {
 		fmt.Printf("%v msec elapsed to render\n", (end.Sub(start)).Nanoseconds()/int64(time.Millisecond))
 	}()
 
-	fmt.Printf("./\n")
+	fmt.Fprintf(output, "./\n")
 	for i, v := range e.entries {
 		render(v, 0, []bool{}, i < len(e.entries)-1)
 	}
+
+	fmt.Println(output)
 }
-
-var output = ioutil.Discard
-
-//var output = os.Stdout
 
 func render(e *entry, depth int, parentHasChild []bool, hasNext bool) {
 	for i := 0; i < depth; i++ {
