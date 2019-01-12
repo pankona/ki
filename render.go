@@ -1,23 +1,22 @@
-package main
+package ki
 
 import (
 	"bytes"
 	"fmt"
-	//"os"
 	"path/filepath"
 	"time"
 )
 
-//var output = ioutil.Discard
-//var output = os.Stdout
 var output = &bytes.Buffer{}
 
 func Render(e *entry) {
-	start := time.Now()
-	defer func() {
-		end := time.Now()
-		fmt.Printf("%v msec elapsed to render\n", (end.Sub(start)).Nanoseconds()/int64(time.Millisecond))
-	}()
+	if profile {
+		start := time.Now()
+		defer func() {
+			end := time.Now()
+			fmt.Printf("%v msec elapsed to render\n", (end.Sub(start)).Nanoseconds()/int64(time.Millisecond))
+		}()
+	}
 
 	fmt.Fprintf(output, "./\n")
 	for i, v := range e.entries {

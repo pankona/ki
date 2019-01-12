@@ -1,66 +1,89 @@
-package main
+package ki
 
 import (
 	"fmt"
-	"os"
+	"io/ioutil"
 	"path/filepath"
 	"sync"
 	"time"
 )
 
-func Traverse(path string) (*entry, error) {
-	start := time.Now()
-	defer func() {
-		end := time.Now()
-		fmt.Printf("%v msec elapsed to traverse\n", (end.Sub(start)).Nanoseconds()/int64(time.Millisecond))
-	}()
-	return traverse(path)
+type Ki struct {
+	ConcurrentNum int
+
+	limit chan struct{}
+	wg    sync.WaitGroup
 }
 
-func traverse(path string) (*entry, error) {
+func New(concurrent int) *Ki {
+	return &Ki{
+		ConcurrentNum: concurrent,
+	}
+}
+
+func (k *Ki) Traverse(path string) (*entry, error) {
+	if profile {
+		start := time.Now()
+		defer func() {
+			end := time.Now()
+			fmt.Printf("%v msec elapsed to traverse\n", (end.Sub(start)).Nanoseconds()/int64(time.Millisecond))
+		}()
+	}
+
+	k.limit = make(chan struct{}, k.ConcurrentNum)
+
 	rootpath, err := filepath.Abs(path)
 	if err != nil {
 		return nil, err
 	}
 
-	rootdir := &entry{path: rootpath, isDir: true}
-
-	emap := sync.Map{}
-	emap.Store(rootpath, rootdir)
-
-	walkfn := func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() && path == rootpath {
-			return nil
-		}
-
-		p, err := filepath.Abs(filepath.Join(path, "."))
-		if err != nil {
-			return err
-		}
-
-		e := &entry{path: p, isDir: info.IsDir()}
-
-		if info.IsDir() {
-			emap.Store(p, e)
-		}
-
-		parent, ok := emap.Load(filepath.Join(p, ".."))
-		if !ok {
-			return fmt.Errorf("failed to register [%s]: [%s] is not registered yet", e.path, parent)
-		}
-		parent.(*entry).entries = append(parent.(*entry).entries, e)
-
-		return nil
+	rootdir := &entry{
+		path:  rootpath,
+		isDir: true,
 	}
 
-	err = filepath.Walk(rootpath, walkfn)
-	if err != nil {
-		return nil, err
-	}
+	k.wg.Add(1)
+	go func() {
+		k.traverse(rootdir)
+		k.wg.Done()
+	}()
+	k.wg.Wait()
 
 	return rootdir, nil
+}
+
+func (k *Ki) traverse(e *entry) {
+	files, err := ioutil.ReadDir(e.path)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	e.entries = make([]*entry, len(files))
+	for i, v := range files {
+		fullpath, err := filepath.Abs(filepath.Join(e.path, v.Name()))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		e.entries[i] = &entry{
+			path:  fullpath,
+			isDir: v.IsDir(),
+		}
+
+		if v.IsDir() {
+			select {
+			case k.limit <- struct{}{}:
+				k.wg.Add(1)
+				go func(i int) {
+					k.traverse(e.entries[i])
+					<-k.limit
+					k.wg.Done()
+				}(i)
+			default:
+				k.traverse(e.entries[i])
+			}
+		}
+	}
 }

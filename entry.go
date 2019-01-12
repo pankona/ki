@@ -1,4 +1,4 @@
-package main
+package ki
 
 type entry struct {
 	isDir   bool
