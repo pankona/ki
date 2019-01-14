@@ -18,6 +18,9 @@ func main() {
 	flag.Parse()
 
 	dirList := flag.Args()[0:]
+	if len(dirList) == 0 {
+		dirList = []string{"."}
+	}
 
 	t := ki.New(*con)
 
