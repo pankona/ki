@@ -12,6 +12,8 @@ type Ki struct {
 	ConcurrentNum   int
 	IgnoreHiddenDir bool
 
+	IsPlane bool
+
 	limit chan struct{}
 	wg    sync.WaitGroup
 }

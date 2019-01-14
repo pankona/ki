@@ -18,7 +18,12 @@ func (k *Ki) Render(e *entry) {
 		}()
 	}
 
-	fmt.Fprintf(output, "./\n")
+	if k.IsPlane {
+		fmt.Fprintf(output, "%s", e.path)
+	} else {
+		fmt.Fprintf(output, "%s/", filepath.Base(e.path))
+	}
+	fmt.Fprintf(output, "\n")
 	for i, v := range e.entries {
 		k.render(v, 0, []bool{}, i < len(e.entries)-1)
 	}
@@ -27,24 +32,28 @@ func (k *Ki) Render(e *entry) {
 }
 
 func (k *Ki) render(e *entry, depth int, parentHasChild []bool, hasNext bool) {
-	for i := 0; i < depth; i++ {
-		if parentHasChild[i] {
-			fmt.Fprintf(output, "|   ")
-		} else {
-			fmt.Fprintf(output, "    ")
+	if k.IsPlane {
+		fmt.Fprintf(output, "%s", e.path)
+	} else {
+		for i := 0; i < depth; i++ {
+			if parentHasChild[i] {
+				fmt.Fprintf(output, "|   ")
+			} else {
+				fmt.Fprintf(output, "    ")
+			}
 		}
-	}
 
-	if hasNext {
-		fmt.Fprintf(output, "|-- ")
-	} else {
-		fmt.Fprintf(output, "`-- ")
-	}
+		if hasNext {
+			fmt.Fprintf(output, "|-- ")
+		} else {
+			fmt.Fprintf(output, "`-- ")
+		}
 
-	if e.isDir {
-		fmt.Fprintf(output, "%s/", filepath.Base(e.path))
-	} else {
-		fmt.Fprintf(output, "%s", filepath.Base(e.path))
+		if e.isDir {
+			fmt.Fprintf(output, "%s/", filepath.Base(e.path))
+		} else {
+			fmt.Fprintf(output, "%s", filepath.Base(e.path))
+		}
 	}
 
 	fmt.Fprintf(output, "\n")

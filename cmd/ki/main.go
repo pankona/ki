@@ -27,6 +27,7 @@ func main() {
 	k := ki.Ki{
 		ConcurrentNum:   *con,
 		IgnoreHiddenDir: !*all,
+		IsPlane:         *plane,
 	}
 
 	if *profile {
