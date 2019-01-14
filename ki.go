@@ -19,12 +19,6 @@ type Ki struct {
 	wg    sync.WaitGroup
 }
 
-func New(concurrent int) *Ki {
-	return &Ki{
-		ConcurrentNum: concurrent,
-	}
-}
-
 func (k *Ki) Traverse(path string) (*entry, error) {
 	if profile {
 		start := time.Now()
