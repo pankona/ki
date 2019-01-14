@@ -24,7 +24,7 @@ func main() {
 		dirList = []string{"."}
 	}
 
-	t := ki.Ki{
+	k := ki.Ki{
 		ConcurrentNum:   *con,
 		IgnoreHiddenDir: !*all,
 	}
@@ -40,11 +40,11 @@ func main() {
 	}
 
 	for _, v := range dirList {
-		rootdir, err := t.Traverse(v)
+		rootdir, err := k.Traverse(v)
 		if err != nil {
 			fmt.Printf("failed to traverse: %v\n", err)
 			os.Exit(1)
 		}
-		t.Render(rootdir)
+		k.Render(rootdir)
 	}
 }
