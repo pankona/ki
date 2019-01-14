@@ -19,7 +19,7 @@ type Ki struct {
 	wg    sync.WaitGroup
 }
 
-func (k *Ki) Traverse(path string) (*entry, error) {
+func (k *Ki) Traverse(path string) (*Entry, error) {
 	if profile {
 		start := time.Now()
 		defer func() {
@@ -35,7 +35,7 @@ func (k *Ki) Traverse(path string) (*entry, error) {
 		return nil, err
 	}
 
-	rootdir := &entry{
+	rootdir := &Entry{
 		path:  rootpath,
 		isDir: true,
 	}
@@ -50,14 +50,14 @@ func (k *Ki) Traverse(path string) (*entry, error) {
 	return rootdir, nil
 }
 
-func (k *Ki) traverse(e *entry) {
+func (k *Ki) traverse(e *Entry) {
 	files, err := ioutil.ReadDir(e.path)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	e.entries = make([]*entry, len(files))
+	e.entries = make([]*Entry, len(files))
 	var ignored int
 
 	for i, v := range files {
@@ -79,7 +79,7 @@ func (k *Ki) traverse(e *entry) {
 			return
 		}
 
-		e.entries[i] = &entry{
+		e.entries[i] = &Entry{
 			path:  fullpath,
 			isDir: v.IsDir(),
 		}

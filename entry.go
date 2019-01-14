@@ -1,7 +1,7 @@
 package ki
 
-type entry struct {
+type Entry struct {
 	isDir   bool
 	path    string
-	entries []*entry
+	entries []*Entry
 }

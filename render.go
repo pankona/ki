@@ -9,7 +9,7 @@ import (
 
 var output = &bytes.Buffer{}
 
-func (k *Ki) Render(e *entry) {
+func (k *Ki) Render(e *Entry) {
 	if profile {
 		start := time.Now()
 		defer func() {
@@ -31,7 +31,7 @@ func (k *Ki) Render(e *entry) {
 	fmt.Println(output)
 }
 
-func (k *Ki) render(e *entry, depth int, parentHasChild []bool, hasNext bool) {
+func (k *Ki) render(e *Entry, depth int, parentHasChild []bool, hasNext bool) {
 	if k.IsPlane {
 		fmt.Fprintf(output, "%s", e.path)
 	} else {
