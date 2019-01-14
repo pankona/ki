@@ -24,7 +24,10 @@ func main() {
 		dirList = []string{"."}
 	}
 
-	t := ki.New(*con)
+	t := ki.Ki{
+		ConcurrentNum:   *con,
+		IgnoreHiddenDir: !*all,
+	}
 
 	if *profile {
 		start := time.Now()

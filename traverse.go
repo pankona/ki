@@ -9,7 +9,8 @@ import (
 )
 
 type Ki struct {
-	ConcurrentNum int
+	ConcurrentNum   int
+	IgnoreHiddenDir bool
 
 	limit chan struct{}
 	wg    sync.WaitGroup
@@ -60,7 +61,17 @@ func (k *Ki) traverse(e *entry) {
 	}
 
 	e.entries = make([]*entry, len(files))
+	var ignored int
+
 	for i, v := range files {
+		if v.Name()[0] == '.' && k.IgnoreHiddenDir {
+			// ignore hidden directory
+			ignored++
+			continue
+		}
+
+		i = i - ignored
+
 		fullpath, err := filepath.Abs(filepath.Join(e.path, v.Name()))
 		if err != nil {
 			fmt.Println(err)
@@ -86,4 +97,7 @@ func (k *Ki) traverse(e *entry) {
 			}
 		}
 	}
+
+	// trim entries according to number of ignored directory
+	e.entries = e.entries[:len(e.entries)-ignored]
 }
