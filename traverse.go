@@ -11,6 +11,7 @@ import (
 type Ki struct {
 	ConcurrentNum   int
 	IgnoreHiddenDir bool
+	IncludeDirOnly  bool
 
 	IsPlane bool
 
@@ -68,6 +69,10 @@ func (k *Ki) traverse(e *entry) {
 	for i, v := range files {
 		if v.Name()[0] == '.' && k.IgnoreHiddenDir {
 			// ignore hidden directory
+			ignored++
+			continue
+		}
+		if !v.IsDir() && k.IncludeDirOnly {
 			ignored++
 			continue
 		}

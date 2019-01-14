@@ -12,6 +12,7 @@ import (
 var (
 	con     = flag.Int("c", 0, "specify concurrent num [default: 0]")
 	all     = flag.Bool("a", false, "specify to include hidden directory [default: false]")
+	onlyDir = flag.Bool("d", false, "specify to include only directories [default: false]")
 	plane   = flag.Bool("p", false, "specify to enable plane rendering [default: false]")
 	profile = flag.Bool("with-profile", false, "specify to enable profiling [default: false]")
 )
@@ -27,6 +28,7 @@ func main() {
 	k := ki.Ki{
 		ConcurrentNum:   *con,
 		IgnoreHiddenDir: !*all,
+		IncludeDirOnly:  *onlyDir,
 		IsPlane:         *plane,
 	}
 
