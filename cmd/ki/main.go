@@ -45,6 +45,6 @@ func main() {
 			fmt.Printf("failed to traverse: %v\n", err)
 			os.Exit(1)
 		}
-		ki.Render(rootdir)
+		t.Render(rootdir)
 	}
 }

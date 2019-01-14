@@ -9,7 +9,7 @@ import (
 
 var output = &bytes.Buffer{}
 
-func Render(e *entry) {
+func (k *Ki) Render(e *entry) {
 	if profile {
 		start := time.Now()
 		defer func() {
@@ -20,13 +20,13 @@ func Render(e *entry) {
 
 	fmt.Fprintf(output, "./\n")
 	for i, v := range e.entries {
-		render(v, 0, []bool{}, i < len(e.entries)-1)
+		k.render(v, 0, []bool{}, i < len(e.entries)-1)
 	}
 
 	fmt.Println(output)
 }
 
-func render(e *entry, depth int, parentHasChild []bool, hasNext bool) {
+func (k *Ki) render(e *entry, depth int, parentHasChild []bool, hasNext bool) {
 	for i := 0; i < depth; i++ {
 		if parentHasChild[i] {
 			fmt.Fprintf(output, "|   ")
@@ -51,6 +51,6 @@ func render(e *entry, depth int, parentHasChild []bool, hasNext bool) {
 
 	hasChild := append(parentHasChild, hasNext)
 	for i, v := range e.entries {
-		render(v, depth+1, hasChild, i < len(e.entries)-1)
+		k.render(v, depth+1, hasChild, i < len(e.entries)-1)
 	}
 }
