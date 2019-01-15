@@ -15,8 +15,10 @@ type Ki struct {
 
 	IsPlane bool
 
-	limit chan struct{}
-	wg    sync.WaitGroup
+	finishCh chan struct{}
+
+	mu         sync.RWMutex
+	workingNum int
 }
 
 func (k *Ki) Traverse(path string) (*Entry, error) {
@@ -28,7 +30,7 @@ func (k *Ki) Traverse(path string) (*Entry, error) {
 		}()
 	}
 
-	k.limit = make(chan struct{}, k.ConcurrentNum)
+	k.finishCh = make(chan struct{})
 
 	rootpath, err := filepath.Abs(path)
 	if err != nil {
@@ -40,12 +42,21 @@ func (k *Ki) Traverse(path string) (*Entry, error) {
 		isDir: true,
 	}
 
-	k.wg.Add(1)
+	k.workingNum++
 	go func() {
 		k.traverse(rootdir)
-		k.wg.Done()
+
+		k.mu.Lock()
+		k.workingNum--
+		k.mu.Unlock()
+
+		k.mu.RLock()
+		if k.workingNum == 0 {
+			k.finishCh <- struct{}{}
+		}
+		k.mu.RUnlock()
 	}()
-	k.wg.Wait()
+	<-k.finishCh
 
 	return rootdir, nil
 }
@@ -85,15 +96,26 @@ func (k *Ki) traverse(e *Entry) {
 		}
 
 		if v.IsDir() {
-			select {
-			case k.limit <- struct{}{}:
-				k.wg.Add(1)
+			k.mu.RLock()
+			if k.workingNum < k.ConcurrentNum {
+				k.mu.RUnlock()
+
+				k.mu.Lock()
+				k.workingNum++
+				k.mu.Unlock()
+
 				go func(i int) {
 					k.traverse(e.entries[i])
-					<-k.limit
-					k.wg.Done()
+
+					k.mu.Lock()
+					k.workingNum--
+					if k.workingNum == 0 {
+						k.finishCh <- struct{}{}
+					}
+					k.mu.Unlock()
 				}(i)
-			default:
+			} else {
+				k.mu.RUnlock()
 				k.traverse(e.entries[i])
 			}
 		}
