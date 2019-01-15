@@ -16,7 +16,7 @@ Available options:
 Usage of ki:
   -a	specify to include hidden directory [default: false]
   -c int
-    	specify concurrent num [default: 0]
+    	specify concurrent num [default: 4] (default 4)
   -d	specify to include only directories [default: false]
   -p	specify to enable plane rendering [default: false]
   -with-profile
