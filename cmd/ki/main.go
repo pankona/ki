@@ -40,7 +40,6 @@ func main() {
 		}()
 
 		ki.EnableProfile()
-		fmt.Printf("Worker num: %d\n", k.ConcurrentNum)
 	}
 
 	for _, v := range dirList {
