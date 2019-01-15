@@ -66,6 +66,7 @@ func (k *Ki) traverse(e *Entry) {
 			ignored++
 			continue
 		}
+
 		if !v.IsDir() && k.IncludeDirOnly {
 			ignored++
 			continue
@@ -99,6 +100,6 @@ func (k *Ki) traverse(e *Entry) {
 		}
 	}
 
-	// trim entries according to number of ignored directory
+	// trim entries according to number of ignored directories
 	e.entries = e.entries[:len(e.entries)-ignored]
 }
