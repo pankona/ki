@@ -4,13 +4,15 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
+	"strconv"
 	"time"
 
 	"github.com/pankona/ki"
 )
 
 var (
-	con     = flag.Int("c", 0, "specify concurrent num [default: 0]")
+	con     = flag.Int("c", runtime.NumCPU(), "specify concurrent num [default: "+strconv.Itoa(runtime.NumCPU())+"]")
 	all     = flag.Bool("a", false, "specify to include hidden directory [default: false]")
 	onlyDir = flag.Bool("d", false, "specify to include only directories [default: false]")
 	plane   = flag.Bool("p", false, "specify to enable plane rendering [default: false]")
