@@ -12,6 +12,7 @@ type Ki struct {
 	ConcurrentNum   int
 	IgnoreHiddenDir bool
 	IncludeDirOnly  bool
+	Depth           int
 
 	IsPlane bool
 
@@ -40,9 +41,11 @@ func (k *Ki) Traverse(path string) (*Entry, error) {
 		isDir: true,
 	}
 
+	var depth int
+
 	k.wg.Add(1)
 	go func() {
-		k.traverse(rootdir)
+		k.traverse(rootdir, depth+1)
 		k.wg.Done()
 	}()
 	k.wg.Wait()
@@ -50,7 +53,11 @@ func (k *Ki) Traverse(path string) (*Entry, error) {
 	return rootdir, nil
 }
 
-func (k *Ki) traverse(e *Entry) {
+func (k *Ki) traverse(e *Entry, depth int) {
+	if depth > k.Depth {
+		return
+	}
+
 	files, err := ioutil.ReadDir(e.path)
 	if err != nil {
 		fmt.Println(err)
@@ -90,12 +97,12 @@ func (k *Ki) traverse(e *Entry) {
 			case k.limit <- struct{}{}:
 				k.wg.Add(1)
 				go func(i int) {
-					k.traverse(e.entries[i])
+					k.traverse(e.entries[i], depth+1)
 					<-k.limit
 					k.wg.Done()
 				}(i)
 			default:
-				k.traverse(e.entries[i])
+				k.traverse(e.entries[i], depth+1)
 			}
 		}
 	}
