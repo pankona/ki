@@ -12,12 +12,13 @@ import (
 )
 
 var (
-	con     = flag.Int("c", runtime.NumCPU(), "specify concurrent num")
-	level   = flag.Int("l", math.MaxInt32, "specify limit of tree depth")
-	all     = flag.Bool("a", false, "specify to include hidden directory (default: false)")
-	onlyDir = flag.Bool("d", false, "specify to include only directories (default: false)")
-	plane   = flag.Bool("p", false, "specify to enable plane rendering (default: false)")
-	profile = flag.Bool("with-profile", false, "specify to enable profiling (default: false)")
+	con      = flag.Int("c", runtime.NumCPU(), "specify concurrent num")
+	level    = flag.Int("l", math.MaxInt32, "specify limit of tree depth")
+	all      = flag.Bool("a", false, "specify to include hidden directory (default: false)")
+	onlyDir  = flag.Bool("d", false, "specify to include only directories (default: false)")
+	onlyFile = flag.Bool("f", false, "specify to include only files (default: false)")
+	plane    = flag.Bool("p", false, "specify to enable plane rendering (default: false)")
+	profile  = flag.Bool("with-profile", false, "specify to enable profiling (default: false)")
 )
 
 func main() {
@@ -32,8 +33,14 @@ func main() {
 		ConcurrentNum:   *con,
 		IgnoreHiddenDir: !*all,
 		IncludeDirOnly:  *onlyDir,
+		IncludeFileOnly: *onlyFile,
 		Depth:           *level,
-		IsPlane:         *plane,
+		IsPlane: func() bool {
+			if *onlyFile {
+				return true
+			}
+			return *plane
+		}(),
 	}
 
 	if *profile {

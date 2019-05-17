@@ -12,6 +12,7 @@ type Ki struct {
 	ConcurrentNum   int
 	IgnoreHiddenDir bool
 	IncludeDirOnly  bool
+	IncludeFileOnly bool
 	Depth           int
 
 	IsPlane bool
