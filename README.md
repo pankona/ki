@@ -14,13 +14,16 @@ Available options:
 
 ```
 Usage of ki:
-  -a	specify to include hidden directory [default: false]
+  -a	specify to include hidden directory (default: false)
   -c int
-    	specify concurrent num [default: 4] (default 4)
-  -d	specify to include only directories [default: false]
-  -p	specify to enable plane rendering [default: false]
+    	specify concurrent num (default 12)
+  -d	specify to include only directories (default: false)
+  -f	specify to include only files (default: false)
+  -l int
+    	specify limit of tree depth (default 2147483647)
+  -p	specify to enable plane rendering (default: false)
   -with-profile
-    	specify to enable profiling [default: false]
+    	specify to enable profiling (default: false)
 ```
 
 Example:
